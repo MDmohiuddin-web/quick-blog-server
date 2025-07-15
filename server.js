@@ -9,15 +9,26 @@ const app = express();
 
 await connectDB();
 
+const allowedOrigins = [
+  "https://quick-blog-client-lemon.vercel.app",
+  "http://localhost:5173"
+];
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN_URL_FOR_CLIENT || "*", // Allow all origins by default
- 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["sessionId", "Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
+  optionsSuccessStatus: 200
 };
 
+app.use(cors(corsOptions));
 // Middlewares
 app.use(cors(corsOptions));
 app.use(express.json());
